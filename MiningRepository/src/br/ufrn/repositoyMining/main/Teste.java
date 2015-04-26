@@ -22,14 +22,17 @@ public class Teste {
 			
 			CommitService cservice = new CommitService(client);
 			
-			List<RepositoryCommit> rc = cservice.getCommits(RepositoryId
-					.create("spring-projects", "spring-boot"));
+			//RepositoryId repId = RepositoryId.create("spring-projects", "spring-boot");
+			RepositoryId repId = RepositoryId.create("JorgePereiraUFRN", "MiningRepository");
+			
+			List<RepositoryCommit> rc = cservice.getCommits(repId);
+			int i = 0;
 			if (!rc.isEmpty()) {
 				for (Iterator iterator = rc.iterator(); iterator.hasNext();) {
 					RepositoryCommit repositoryCommit = (RepositoryCommit) iterator
 							.next();
-					System.out.println(repositoryCommit.getStats().getTotal());
-
+					System.out.println(repositoryCommit.getAuthor().getLogin());
+					
 				}
 			} else {
 				System.out.println("lista vazia");

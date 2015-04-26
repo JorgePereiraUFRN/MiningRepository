@@ -4,10 +4,29 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="libs/jsm-1.4-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="libs/github-api-1.67.jar"/>
-	<classpathentry kind="lib" path="libs/org.eclipse.egit.github.core-4.0.0-SNAPSHOT.jar" sourcepath="libs/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-sources.jar">
+	<classpathentry kind="lib" path="libs/org.eclipse.egit.github.core-4.0.0-SNAPSHOT.jar" sourcepath="libs/sources/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/MiningRepository/libs/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/MiningRepository/libs/javadoc/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/bridge-method-annotation-1.11.jar" sourcepath="libs/sources/bridge-method-annotation-1.11-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/MiningRepository/libs/javadoc/bridge-method-annotation-1.11-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="libs/commons-lang3-3.4.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-databind-2.3.1.jar"/>
+	<classpathentry kind="lib" path="libs/annotation-indexer-1.4.jar"/>
+	<classpathentry kind="lib" path="libs/bridge-method-annotation-1.14.jar"/>
+	<classpathentry kind="lib" path="libs/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="libs/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-annotations-2.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="libs/okhttp-2.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/okhttp-urlconnection-2.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/okio-1.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
