@@ -18,13 +18,13 @@ import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
  */
 public interface MetricsFacadeInterface {
     
-   void calcMetrics();
+  // void calcMetrics();
     
-   Map<String, ClassMetrics> getClassMetrics();
+   Map<String, ClassMetrics> getClassMetrics(String pahtProject);
     
-   Map<String, PackageMetrics> getPackageMetrics();
+   Map<String, PackageMetrics> getPackageMetrics(String pahtProject);
     
-   Map<Metric, Double> getAverageMetricsPoject();
+   Map<Metric, Double> getAverageMetricsPoject(String pahtProject);
    
    void plotGraphics(Map<String, String> pathVersions, Metric[] metrics);
    
