@@ -9,5 +9,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/MiningRepository/libs/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/jfreechart-1.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/jcommon-1.0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
