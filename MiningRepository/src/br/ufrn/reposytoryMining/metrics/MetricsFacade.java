@@ -60,73 +60,11 @@ import nl.rug.jbi.jsm.util.ClassDiscoverer;
  */
 public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
-	/*
-	 * private final JSMCore core; private final Set<String> input; private
-	 * boolean isDone = false;
-	 * 
-	 * private final Table<String, Class, Object> resultsClass = HashBasedTable
-	 * .create(); private final Table<String, Class, Object> resultsPackage =
-	 * HashBasedTable .create(); private final Table<String, Class, Object>
-	 * resultsCollection = HashBasedTable .create();
-	 */
-	public MetricsFacade(/* String pathProject */) {
-		/*
-		 * this.core = new JSMCore(); input = new HashSet<String>();
-		 * input.add(pathProject);
-		 * 
-		 * // CKJM core.registerMetricCollection(new CKJM()); // Package metrics
-		 * core.registerMetricCollection(new
-		 * nl.rug.jbi.jsm.metrics.packagemetrics.PackageMetrics());
-		 */
+	public MetricsFacade() {
+		
 	}
 
-	/*
-	 * @Override public void init() { final Set<String> classNames =
-	 * FluentIterable.from(input) .transform(new Function<String, File>() {
-	 * 
-	 * @Override public File apply(String fileName) { return new File(fileName);
-	 * } }).filter(new Predicate<File>() {
-	 * 
-	 * @Override public boolean apply(File file) { return file.exists(); }
-	 * }).transformAndConcat(new Function<File, Iterable<String>>() {
-	 * 
-	 * @Override public Iterable<String> apply(File file) { try { return
-	 * ClassDiscoverer.findClassNames(file); } catch (IOException e) { return
-	 * ImmutableList.of(); } } }).toSet();
-	 * 
-	 * final URL[] dataSources = FluentIterable.from(input) .transform(new
-	 * Function<String, File>() {
-	 * 
-	 * @Override public File apply(String fileName) { return new File(fileName);
-	 * } }).filter(new Predicate<File>() {
-	 * 
-	 * @Override public boolean apply(File file) { return file.exists(); }
-	 * }).transform(new Function<File, URL>() {
-	 * 
-	 * @Override public URL apply(File file) { try { return
-	 * file.toURI().toURL(); } catch (MalformedURLException e) { return null; }
-	 * } }).filter(new Predicate<URL>() {
-	 * 
-	 * @Override public boolean apply(URL url) { return url != null; }
-	 * }).toArray(URL.class);
-	 * 
-	 * core.process(this, classNames, dataSources); }
-	 * 
-	 * @Override public void processResult(List<MetricResult> resultList) { for
-	 * (final MetricResult result : resultList) { final Table<String, Class,
-	 * Object> targetTable;
-	 * 
-	 * switch (result.getScope()) { case CLASS: targetTable = resultsClass;
-	 * break; case PACKAGE: targetTable = resultsPackage; break; case
-	 * COLLECTION: targetTable = resultsCollection; break; default: throw new
-	 * IllegalStateException("Unknown scope: " + result.getScope()); }
-	 * targetTable.put(result.getIdentifier(), result.getMetricClass(),
-	 * result.getValue()); } }
-	 * 
-	 * @Override public void signalDone() { isDone = true;
-	 * 
-	 * }
-	 */
+	
 
 	private synchronized void calcMetrics(MeasureMetrics measure) {
 		if (!measure.isDone()) {
@@ -324,7 +262,7 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 		//testGetAverageMetrics(metricsFacade);
 
-		testPlotGraphic(metricsFacade);
+		//testPlotGraphic(metricsFacade);
 
 	
 
@@ -387,16 +325,5 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 	}
 
-	/*
-	 * private static void printMetrics(Map<String, Map<Class, Object>> map) {
-	 * 
-	 * for (String key : map.keySet()) {
-	 * 
-	 * Map<Class, Object> m = map.get(key);
-	 * 
-	 * System.out.println("\n" + key);
-	 * 
-	 * for (Class c : m.keySet()) { System.out.println(c.getName() + "   " +
-	 * m.get(c)); } } }
-	 */
+	
 }
