@@ -12,12 +12,14 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
+import br.ufrn.repositoyMining.githubAPI.TokenOAuth;
+
 public class FindColaborators {
 
 	public static void main(String[] args) {
 		try {
 			GitHubClient client = new GitHubClient();
-			client.setOAuth2Token("9e9ed0cd365691a55ab3c63ad8a86447f3560d9e");
+			client.setOAuth2Token(TokenOAuth.getToken());
 
 			CommitService cservice = new CommitService(client);
 
