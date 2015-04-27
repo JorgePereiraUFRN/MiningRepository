@@ -6,8 +6,10 @@
 package br.ufrn.reposytoryMining.metrics;
 
 import java.util.List;
+import java.util.Map;
 
 import br.ufrn.reposytoryMining.metrics.model.ClassMetrics;
+import br.ufrn.reposytoryMining.metrics.model.Metric;
 import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
 
 /**
@@ -16,10 +18,14 @@ import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
  */
 public interface MetricsFacadeInterface {
     
-    void calcMetrics();
+   void calcMetrics();
     
-   List<ClassMetrics> getClassMetrics();
+   Map<String, ClassMetrics> getClassMetrics();
     
-   List<PackageMetrics> getPackageMetrics();
+   Map<String, PackageMetrics> getPackageMetrics();
     
+   Map<Metric, Double> getAverageMetricsPoject();
+   
+   void plotGraphics(Map<String, String> pathVersions, Metric[] metrics);
+   
 }

@@ -9,15 +9,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/MiningRepository/libs/javadoc/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/bridge-method-annotation-1.11.jar" sourcepath="libs/sources/bridge-method-annotation-1.11-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/MiningRepository/libs/javadoc/bridge-method-annotation-1.11-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="libs/commons-lang3-3.4.jar"/>
-	<classpathentry kind="lib" path="libs/jackson-databind-2.3.1.jar"/>
 	<classpathentry kind="lib" path="libs/annotation-indexer-1.4.jar"/>
 	<classpathentry kind="lib" path="libs/bridge-method-annotation-1.14.jar"/>
 	<classpathentry kind="lib" path="libs/commons-codec-1.7.jar"/>
@@ -28,5 +20,7 @@
 	<classpathentry kind="lib" path="libs/okhttp-2.0.0.jar"/>
 	<classpathentry kind="lib" path="libs/okhttp-urlconnection-2.0.0.jar"/>
 	<classpathentry kind="lib" path="libs/okio-1.0.0.jar"/>
+	<classpathentry kind="lib" path="libs/jfreechart-1.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/jcommon-1.0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

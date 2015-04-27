@@ -6,7 +6,10 @@
 package br.ufrn.reposytoryMining.metrics;
 
 import br.ufrn.reposytoryMining.metrics.model.ClassMetrics;
+import br.ufrn.reposytoryMining.metrics.model.Metric;
 import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
+import br.ufrn.reposytoryMining.metrics.util.Calc;
+import br.ufrn.reposytoryMining.metrics.util.PlotGraphic;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -21,6 +24,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -172,9 +177,9 @@ public class MetricsFacade implements Frontend, MetricsFacadeInterface {
 	}
 
 	@Override
-	public List<ClassMetrics> getClassMetrics() {
+	public Map<String, ClassMetrics> getClassMetrics() {
 
-		List<ClassMetrics> metrics = new ArrayList<ClassMetrics>();
+		Map<String, ClassMetrics> metrics = new HashMap<String, ClassMetrics>();
 
 		if (!isDone) {
 
@@ -210,9 +215,10 @@ public class MetricsFacade implements Frontend, MetricsFacadeInterface {
 						metricsClass.setCA((Integer) m.get(c));
 					} else if (c.getName().equals(CBO.class.getName())) {
 						metricsClass.setCBO((Integer) m.get(c));
-					} /*else if (c.getName().equals(CBO.class.getName())) {
-						metricsClass.setCBO((Float) m.get(c));
-					}*/ else if (c.getName().equals(DIT.class.getName())) {
+					} /*
+					 * else if (c.getName().equals(CBO.class.getName())) {
+					 * metricsClass.setCBO((Float) m.get(c)); }
+					 */else if (c.getName().equals(DIT.class.getName())) {
 						metricsClass.setDIT((Integer) m.get(c));
 					} else if (c.getName().equals(LCOM.class.getName())) {
 						metricsClass.setLCOM((Integer) m.get(c));
@@ -232,16 +238,16 @@ public class MetricsFacade implements Frontend, MetricsFacadeInterface {
 				}
 			}
 
-			metrics.add(metricsClass);
+			metrics.put(key, metricsClass);
 
 		}
 		return metrics;
 	}
 
 	@Override
-	public List<PackageMetrics> getPackageMetrics() {
+	public Map<String, PackageMetrics> getPackageMetrics() {
 
-		List<PackageMetrics> metricsPackage = new ArrayList<PackageMetrics>();
+		Map<String, PackageMetrics> metricsPackage = new HashMap<>();
 
 		if (!isDone) {
 
@@ -286,31 +292,102 @@ public class MetricsFacade implements Frontend, MetricsFacadeInterface {
 					// depois logar
 					System.out.println(e);
 				}
-				
-				
 
 			}
-			metricsPackage.add(metrics);
+			metricsPackage.put(key, metrics);
 		}
 
 		return metricsPackage;
 
 	}
 
+	@Override
+	public Map<Metric, Double> getAverageMetricsPoject() {
+
+		Map<String, ClassMetrics> classMetrics = getClassMetrics();
+
+		return Calc.getAverageClassMetrics(classMetrics);
+
+	}
+
+	@Override
+	public void plotGraphics(Map<String, String> pathVersions, Metric[] metrics) {
+
+		Map<String, Map<Metric, Double>> metricsProjects = new HashMap<>();
+
+		
+		for (String version : pathVersions.keySet()) {
+
+			try {
+				MetricsFacadeInterface facade = new MetricsFacade(pathVersions.get(version));
+
+				Map<Metric, Double> metricsClass = facade
+						.getAverageMetricsPoject();
+
+				metricsProjects.put(version , metricsClass);
+
+			} catch (MetricPreparationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		PlotGraphic plot = null;
+
+		for (Metric m : metrics) {
+
+			// values of metrics by revision
+			Map<String, Double> values = new HashMap<>();
+
+			for (String vers : metricsProjects.keySet()) {
+
+				// pega as metricas de uma versao do projeto
+				Map<Metric, Double> metricValues = metricsProjects.get(vers);
+				// poe o mapa a versao do projeto e o valor da metrica pra aqela
+				// versao
+				values.put(vers, metricValues.get(m));
+			}
+
+			plot = new PlotGraphic("Metric: " + m, m.toString(), 10, values);
+
+			plot.plot();
+		}
+
+	}
+
 	public static void main(String[] args) throws MetricPreparationException {
 
 		MetricsFacadeInterface metricsFacade = new MetricsFacade(
-				"/home/jorge/workspace/Driver");
+				"/home/jorge/projetos_git/spring-boot-master/spring-boot/target/spring-boot-1.3.0.BUILD-SNAPSHOT.jar");
 
-		List<ClassMetrics> classMetrics = metricsFacade.getClassMetrics();
+		// Map<String, ClassMetrics> classMetrics =
+		// metricsFacade.getClassMetrics();
 
-		List<PackageMetrics> packageMetrics = metricsFacade.getPackageMetrics();
+		// Map<String, PackageMetrics> packageMetrics =
+		// metricsFacade.getPackageMetrics();
 
-		System.out.println("\n\nclasses");
-		printList(classMetrics);
+		// System.out.println("\n\nclasses");
+		// printList(classMetrics.values());
 
-		System.out.println("\n\npacotes");
-		printList(packageMetrics);
+		// System.out.println("\n\npacotes");
+		// printList(packageMetrics.values());
+
+		// Map<Metric, Double> average =
+		// metricsFacade.getAverageMetricsPoject();
+		// printMap(average);
+
+		Map<String , String> versions = new HashMap<>();
+
+		versions.put("1.0", "/home/jorge/projetos_git/spring-boot-master/spring-boot/target/spring-boot-1.3.0.BUILD-SNAPSHOT.jar");
+		versions.put("1.0.1","/home/jorge/ec2.jar");
+		versions.put("1.1","/home/jorge/workspace/Diver");
+		versions.put("1.1.1", "/home/jorge/workspace/Email");
+		versions.put("1.1.2","/home/jorge/workspace/loadDriver");
+
+		Metric[] m = new Metric[] { Metric.CBO, Metric.DIT };
+
+		metricsFacade.plotGraphics(versions, m);
 
 		// metricsFacade.calcMetrics();
 
@@ -330,10 +407,18 @@ public class MetricsFacade implements Frontend, MetricsFacadeInterface {
 
 	}
 
-	private static void printList(List list) {
+	private static void printList(Collection list) {
 
 		for (Object o : list) {
 			System.out.println(o.toString());
+		}
+
+	}
+
+	private static void printMap(Map m) {
+
+		for (Object key : m.keySet()) {
+			System.out.println(key + ": " + m.get(key));
 		}
 
 	}
