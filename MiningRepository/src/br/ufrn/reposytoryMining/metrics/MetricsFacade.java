@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.egit.github.core.MergeStatus;
+
 import nl.rug.jbi.jsm.core.JSMCore;
 import nl.rug.jbi.jsm.core.calculator.MetricResult;
 import nl.rug.jbi.jsm.core.pipeline.MetricPreparationException;
@@ -60,8 +62,17 @@ import nl.rug.jbi.jsm.util.ClassDiscoverer;
  */
 public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
+	private static Map<Metric, Double> idealVelues = new HashMap<>();
+	
 	public MetricsFacade() {
-		
+		idealVelues.put(Metric.CA, 7.0);
+		idealVelues.put(Metric.NOC, 17.0);
+		idealVelues.put(Metric.LCOM, 2.0);
+		idealVelues.put(Metric.WMC, 14.0);
+		idealVelues.put(Metric.NPM, 8.0);
+		idealVelues.put(Metric.DIT, 2.0);
+		idealVelues.put(Metric.RFC, 27.0);
+		idealVelues.put(Metric.CBO, 7.0);
 	}
 
 	
@@ -245,7 +256,7 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 				values.put(vers, metricValues.get(m));
 			}
 
-			plot = new PlotGraphic("Metric: " + m, m.toString(), 10, values);
+			plot = new PlotGraphic("Metric: " + m, m.toString(), idealVelues.get(m), values);
 
 			plot.plot();
 		}
@@ -262,7 +273,7 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 		//testGetAverageMetrics(metricsFacade);
 
-		//testPlotGraphic(metricsFacade);
+		testPlotGraphic(metricsFacade);
 
 	
 
@@ -279,7 +290,7 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 		versions.put("1.1.1", "/home/jorge/workspace/Email");
 		versions.put("1.1.2", "/home/jorge/workspace/loadDriver");
 
-		Metric[] m = new Metric[] { Metric.CBO, Metric.DIT };
+		Metric[] m = new Metric[] { Metric.CBO, Metric.DIT, Metric.LCOM, Metric.NOC, Metric.NPM };
 
 		metricsFacade.plotGraphics(versions, m);
 	}
