@@ -269,7 +269,7 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 		//testeGetClassMetrics(metricsFacade);
 
-		// testGetPackageMetrics(metricsFacade);
+		//testGetPackageMetrics(metricsFacade);
 
 		//testGetAverageMetrics(metricsFacade);
 
@@ -282,13 +282,18 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 	private static void testPlotGraphic(MetricsFacadeInterface metricsFacade) {
 		Map<String, String> versions = new HashMap<>();
 
-		versions.put(
-				"1.0",
-				"/home/jorge/projetos_git/spring-boot-master/spring-boot/target/spring-boot-1.3.0.BUILD-SNAPSHOT.jar");
-		versions.put("1.0.1", "/home/jorge/ec2.jar");
-		versions.put("1.1", "/home/jorge/workspace/Diver");
-		versions.put("1.1.1", "/home/jorge/workspace/Email");
-		versions.put("1.1.2", "/home/jorge/workspace/loadDriver");
+		//versions.put("4.2.19", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.19.Final.jar");
+		//versions.put("4.2.18", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.18.Final.jar");
+		//versions.put("4.2.7", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.7.Final.jar");
+		//versions.put("4.2.6", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.6.Final.jar");
+		versions.put("4.2.5", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.5.Final.jar");
+		versions.put("4.2.4", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.4.Final.jar");
+		versions.put("4.2.3", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.3.Final.jar");
+		versions.put("4.2.2", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.2.Final.jar");
+		
+		versions.put("3.5", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-3.5.0-Final.jar");
+		versions.put("3.6", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-3.6.0.CR2.jar");
+		versions.put("5.0", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-5.0.0.Beta1.jar");
 
 		Metric[] m = new Metric[] { Metric.CBO, Metric.DIT, Metric.LCOM, Metric.NOC, Metric.NPM };
 
@@ -298,25 +303,25 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 	private static void testGetAverageMetrics(
 			MetricsFacadeInterface metricsFacade) {
 		Map<Metric, Double> average =
-		metricsFacade.getAverageMetricsPoject("/home/jorge/workspace/Driver");
+		metricsFacade.getAverageMetricsPoject("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
 		printMap(average);
 	}
 
 	private static void testGetPackageMetrics(
 			MetricsFacadeInterface metricsFacade) {
 		Map<String, PackageMetrics> packageMetrics =
-		 metricsFacade.getPackageMetrics("/home/jorge/workspace/Driver");
+		 metricsFacade.getPackageMetrics("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
 
-		System.out.println("\n\npacotes");
+		System.out.println("\n package metrics");
 		printList(packageMetrics.values());
 	}
 
 	private static void testeGetClassMetrics(
 			MetricsFacadeInterface metricsFacade) {
 		Map<String, ClassMetrics> classMetrics =
-		 metricsFacade.getClassMetrics("/home/jorge/workspace/Driver");
+		 metricsFacade.getClassMetrics("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
 		
-		System.out.println("\n\nclasses "+classMetrics.size());
+		System.out.println("\n classes metrics "+classMetrics.size());
 		printList(classMetrics.values());
 	}
 

@@ -24,14 +24,14 @@ public class FindRelevantCommits {
 			GitHubClient client = new GitHubClient();
 			client.setOAuth2Token(TokenOAuth.getToken());
 			
-			
 			CommitService cservice = new CommitService(client);
 			
 			//RepositoryId repId = RepositoryId.create("spring-projects", "spring-boot");
-			//RepositoryId repId = RepositoryId.create("JorgePereiraUFRN", "MiningRepository");
-			RepositoryId repId = RepositoryId.create("eclipse", "smarthome");
+			RepositoryId repId = RepositoryId.create("JorgePereiraUFRN", "MiningRepository");
+			//RepositoryId repId = RepositoryId.create("eclipse", "smarthome");
 			
 			List<RepositoryCommit> rc = cservice.getCommits(repId);
+			
 			Map<Integer, String> treeMap = new TreeMap<Integer, String>(
 		    		new Comparator<Integer>() {
 		    			@Override
@@ -39,6 +39,7 @@ public class FindRelevantCommits {
 		    				return arg1.compareTo(arg0);
 		    			}
 					});
+			
 			if (!rc.isEmpty()) {
 				
 				for (Iterator iterator = rc.iterator(); iterator.hasNext();) {
@@ -48,9 +49,7 @@ public class FindRelevantCommits {
 					treeMap.put(temp.getStats().getTotal(), repositoryCommit.getSha());
 								
 				}
-			} else {
-				System.out.println("lista vazia");
-			}
+			} 
 			
 		    
 		    for (Map.Entry<Integer, String> entry : treeMap.entrySet()) {

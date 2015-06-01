@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="libs/jsm-1.4-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="libs/github-api-1.67.jar"/>
 	<classpathentry kind="lib" path="libs/org.eclipse.egit.github.core-4.0.0-SNAPSHOT.jar" sourcepath="libs/sources/org.eclipse.egit.github.core-4.0.0-SNAPSHOT-sources.jar">
@@ -22,5 +21,6 @@
 	<classpathentry kind="lib" path="libs/okio-1.0.0.jar"/>
 	<classpathentry kind="lib" path="libs/jfreechart-1.0.4.jar"/>
 	<classpathentry kind="lib" path="libs/jcommon-1.0.8.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

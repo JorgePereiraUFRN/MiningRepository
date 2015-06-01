@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -33,7 +34,7 @@ public class Teste {
 				for (Iterator iterator = rc.iterator(); iterator.hasNext();) {
 					RepositoryCommit repositoryCommit = (RepositoryCommit) iterator
 							.next();
-					System.out.println(repositoryCommit.getSha());
+					System.out.println("hash: "+repositoryCommit.getSha()+"\n autor: "+repositoryCommit.getUrl()+"\n");
 					
 				}
 			} else {
