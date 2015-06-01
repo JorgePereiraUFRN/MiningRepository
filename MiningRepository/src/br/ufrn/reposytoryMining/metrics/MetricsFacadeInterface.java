@@ -7,8 +7,11 @@ package br.ufrn.reposytoryMining.metrics;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import br.ufrn.reposytoryMining.exceptions.retrieveCommitExeption;
 import br.ufrn.reposytoryMining.metrics.model.ClassMetrics;
+import br.ufrn.reposytoryMining.metrics.model.Commit;
 import br.ufrn.reposytoryMining.metrics.model.Metric;
 import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
 
@@ -27,5 +30,7 @@ public interface MetricsFacadeInterface {
    Map<Metric, Double> getAverageMetricsPoject(String pahtProject);
    
    void plotGraphics(Map<String, String> pathVersions, Metric[] metrics);
+   
+   Set<Commit> downloadRelevantCommits(String ownerRepository, String repository) throws retrieveCommitExeption;
    
 }

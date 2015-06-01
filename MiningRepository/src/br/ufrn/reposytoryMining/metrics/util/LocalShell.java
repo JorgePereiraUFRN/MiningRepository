@@ -15,9 +15,11 @@ public class LocalShell {
     public void executeCommand(final String command) throws IOException {
         
         final ArrayList<String> commands = new ArrayList<String>();
-      //  commands.add("/bin/bash");
-       // commands.add("-c");
+        commands.add("/bin/bash");
+        commands.add("-c");
         commands.add(command);
+        
+        
         
         BufferedReader br = null;        
         
@@ -52,7 +54,10 @@ public class LocalShell {
     
     public static void main (String[] args) throws IOException {
         final LocalShell shell = new LocalShell();
-        shell.executeCommand("ls");
+        
+        shell.executeCommand("ls projetos_git/ ~");
+       //shell.executeCommand("ls");
+       //shell.executeCommand("unzip /home/jorge/projetos_git/subversion-trunk.zip -d /home/jorge/projetos_git/");
     }
 }
 

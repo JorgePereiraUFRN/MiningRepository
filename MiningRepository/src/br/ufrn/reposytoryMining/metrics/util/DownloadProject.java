@@ -8,7 +8,7 @@ import java.net.URL;
 
 public class DownloadProject {
 
-	public static File downloadFromURL(String stringUrl, String pathLocal,
+	public File downloadFromURL(String stringUrl, String pathLocal,
 			String hash) throws IOException {
 
 		// Encapsula a URL num objeto java.net.URL
@@ -20,7 +20,7 @@ public class DownloadProject {
 		InputStream is = url.openStream();
 
 		// ... e de escrita.
-		FileOutputStream fos = new FileOutputStream(pathLocal + hash);
+		FileOutputStream fos = new FileOutputStream(pathLocal + hash+".zip");
 
 		// Le e grava byte a byte.
 		int umByte = 0;
@@ -32,7 +32,7 @@ public class DownloadProject {
 		fos.close();
 
 		// apos criar o arquivo fisico, retorna referencia para o mesmo
-		return new File(pathLocal + hash);
+		return new File(pathLocal + hash+".zip");
 
 	}
 

@@ -5,10 +5,14 @@
  */
 package br.ufrn.reposytoryMining.metrics;
 
+import br.ufrn.repositoyMining.Commits.RelevantCommits;
+import br.ufrn.reposytoryMining.exceptions.retrieveCommitExeption;
 import br.ufrn.reposytoryMining.metrics.model.ClassMetrics;
+import br.ufrn.reposytoryMining.metrics.model.Commit;
 import br.ufrn.reposytoryMining.metrics.model.Metric;
 import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
 import br.ufrn.reposytoryMining.metrics.util.Calc;
+import br.ufrn.reposytoryMining.metrics.util.DownloadProject;
 import br.ufrn.reposytoryMining.metrics.util.MeasureMetrics;
 import br.ufrn.reposytoryMining.metrics.util.PlotGraphic;
 
@@ -63,7 +67,7 @@ import nl.rug.jbi.jsm.util.ClassDiscoverer;
 public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 	private static Map<Metric, Double> idealVelues = new HashMap<>();
-	
+
 	public MetricsFacade() {
 		idealVelues.put(Metric.CA, 7.0);
 		idealVelues.put(Metric.NOC, 17.0);
@@ -74,8 +78,6 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 		idealVelues.put(Metric.RFC, 27.0);
 		idealVelues.put(Metric.CBO, 7.0);
 	}
-
-	
 
 	private synchronized void calcMetrics(MeasureMetrics measure) {
 		if (!measure.isDone()) {
@@ -256,61 +258,161 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 				values.put(vers, metricValues.get(m));
 			}
 
-			plot = new PlotGraphic("Metric: " + m, m.toString(), idealVelues.get(m), values);
+			plot = new PlotGraphic("Metric: " + m, m.toString(),
+					idealVelues.get(m), values);
 
 			plot.plot();
 		}
 
 	}
 
+	@Override
+	public Set<Commit> downloadRelevantCommits(String ownerRepository,
+			String repository) throws retrieveCommitExeption {
+
+		RelevantCommits relevantCommits = new RelevantCommits(ownerRepository,
+				repository);
+
+		try {
+			Map<String, List<Commit>> commits = relevantCommits
+					.getRelevantCommitsOfUser();
+
+			Map<String, String> downloadedCommits = new HashMap();
+
+			Set<Commit> mostRelevantCommits = new HashSet<Commit>();
+
+			for (String user : commits.keySet()) {
+				
+				
+				int cont = 0;
+				for (Commit c : commits.get(user)) {
+
+					
+					// o commit ja foi baixado pq era o previus de um outro q
+					// tbm foi baixado
+					if (downloadedCommits.get(c.getCommit().getSha()) == null) {
+
+						DownloadCommit(c);
+
+						downloadedCommits.put(c.getCommit().getCommit()
+								.getSha(), null);
+						mostRelevantCommits.add(c);
+					}
+
+					//baixa o codigo da revisão anterior para depois fazer a comparação entre as metricas
+					if (c.getPrevius() != null && downloadedCommits.get(c.getPrevius().getCommit()
+							.getSha()) == null) {
+
+						DownloadCommit(c.getPrevius());
+
+						downloadedCommits.put(c.getPrevius().getCommit()
+								.getCommit().getSha(), null);
+
+					}
+					
+					System.out.println(" ==== Commit baixado =="+
+					"\n hash: "+c.getCommit().getSha()+" commiter: "+c.getCommit().getAuthor().getHtmlUrl());
+					
+					//baixar no maximo 5 commits de cada usuário
+					if(cont++ == 5){
+						break;
+					}
+				
+
+				}
+
+			}
+
+		} catch (IOException e) {
+			throw new retrieveCommitExeption();
+		}
+
+		return null;
+	}
+
+	private void DownloadCommit(Commit c) throws IOException {
+		
+		String urlDownload = c.getCommit().getUrl()
+				.replace("https://api.", "https://").replace("/repos/", "/")
+				.replace("/commits/", "/archive/")
+				+ ".zip";
+
+		DownloadProject downloadProject = new DownloadProject();
+		
+		downloadProject.downloadFromURL(urlDownload,
+				"/home/jorge/projetos_git/Junit-Commits/", c.getCommit()
+						.getSha());
+	}
+
 	public static void main(String[] args) throws MetricPreparationException {
 
 		MetricsFacadeInterface metricsFacade = new MetricsFacade();
 
-		//testeGetClassMetrics(metricsFacade);
+		// testeGetClassMetrics(metricsFacade);
 
-		//testGetPackageMetrics(metricsFacade);
+		// testGetPackageMetrics(metricsFacade);
 
-		//testGetAverageMetrics(metricsFacade);
+		// testGetAverageMetrics(metricsFacade);
 
 		testPlotGraphic(metricsFacade);
 
-	
+		//baixarCodigoFonte(metricsFacade);
 
+	}
+
+	private static void baixarCodigoFonte(MetricsFacadeInterface metricsFacade) {
+		try {
+			metricsFacade.downloadRelevantCommits("junit-team", "junit");
+		} catch (retrieveCommitExeption e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static void testPlotGraphic(MetricsFacadeInterface metricsFacade) {
 		Map<String, String> versions = new HashMap<>();
 
-		//versions.put("4.2.19", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.19.Final.jar");
-		//versions.put("4.2.18", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.18.Final.jar");
-		//versions.put("4.2.7", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.7.Final.jar");
-		//versions.put("4.2.6", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.6.Final.jar");
-		versions.put("4.2.5", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.5.Final.jar");
-		versions.put("4.2.4", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.4.Final.jar");
-		versions.put("4.2.3", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.3.Final.jar");
-		versions.put("4.2.2", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.2.Final.jar");
-		
-		versions.put("3.5", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-3.5.0-Final.jar");
-		versions.put("3.6", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-3.6.0.CR2.jar");
-		versions.put("5.0", "/home/jorge/Área de Trabalho/hinernate/hibernate-core-5.0.0.Beta1.jar");
+		// versions.put("4.2.19",
+		// "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.19.Final.jar");
+		// versions.put("4.2.18",
+		// "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.18.Final.jar");
+		// versions.put("4.2.7",
+		// "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.7.Final.jar");
+		// versions.put("4.2.6",
+		// "/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.6.Final.jar");
+		versions.put("4.2.5",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.5.Final.jar");
+		versions.put("4.2.4",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.4.Final.jar");
+		versions.put("4.2.3",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.3.Final.jar");
+		versions.put("4.2.2",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-4.2.2.Final.jar");
 
-		Metric[] m = new Metric[] { Metric.CBO, Metric.DIT, Metric.LCOM, Metric.NOC, Metric.NPM };
+		versions.put("3.5",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-3.5.0-Final.jar");
+		versions.put("3.6",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-3.6.0.CR2.jar");
+		versions.put("5.0",
+				"/home/jorge/Área de Trabalho/hinernate/hibernate-core-5.0.0.Beta1.jar");
+
+		Metric[] m = new Metric[] { Metric.CBO, Metric.DIT, Metric.LCOM,
+				Metric.NOC, Metric.NPM };
 
 		metricsFacade.plotGraphics(versions, m);
 	}
 
 	private static void testGetAverageMetrics(
 			MetricsFacadeInterface metricsFacade) {
-		Map<Metric, Double> average =
-		metricsFacade.getAverageMetricsPoject("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
+		Map<Metric, Double> average = metricsFacade
+				.getAverageMetricsPoject("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
 		printMap(average);
 	}
 
 	private static void testGetPackageMetrics(
 			MetricsFacadeInterface metricsFacade) {
-		Map<String, PackageMetrics> packageMetrics =
-		 metricsFacade.getPackageMetrics("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
+		Map<String, PackageMetrics> packageMetrics = metricsFacade
+				.getPackageMetrics("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
 
 		System.out.println("\n package metrics");
 		printList(packageMetrics.values());
@@ -318,10 +420,10 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 	private static void testeGetClassMetrics(
 			MetricsFacadeInterface metricsFacade) {
-		Map<String, ClassMetrics> classMetrics =
-		 metricsFacade.getClassMetrics("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
-		
-		System.out.println("\n classes metrics "+classMetrics.size());
+		Map<String, ClassMetrics> classMetrics = metricsFacade
+				.getClassMetrics("/home/jorge/projetos_git/github-api-github-api-1.68/target/github-api-1.68.jar");
+
+		System.out.println("\n classes metrics " + classMetrics.size());
 		printList(classMetrics.values());
 	}
 
@@ -341,5 +443,4 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 	}
 
-	
 }
