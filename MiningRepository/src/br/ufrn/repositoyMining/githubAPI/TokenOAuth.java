@@ -2,6 +2,6 @@ package br.ufrn.repositoyMining.githubAPI;
 
 public class TokenOAuth {
 	public static String getToken(){
-		return "938d54e1728ed48e6b2f589a6d4a6099ab30128e";
+		return "e541852551505faf4a8335f9e8614c32cc040c88";
 	}
 }

@@ -6,6 +6,7 @@
 package br.ufrn.reposytoryMining.metrics;
 
 import br.ufrn.repositoyMining.Commits.RelevantCommits;
+import br.ufrn.repositoyMining.Commits.SourceCodeCommit;
 import br.ufrn.reposytoryMining.exceptions.retrieveCommitExeption;
 import br.ufrn.reposytoryMining.metrics.model.ClassMetrics;
 import br.ufrn.reposytoryMining.metrics.model.Commit;
@@ -35,6 +36,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -281,68 +287,77 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 			Set<Commit> mostRelevantCommits = new HashSet<Commit>();
 
+			ExecutorService pool = Executors.newCachedThreadPool();
+
+			Set<Future<String>> futures = new HashSet<>();
+
+			int contUsers = 0;
 			for (String user : commits.keySet()) {
-				
-				
-				int cont = 0;
+
+				int contCommits = 0;
 				for (Commit c : commits.get(user)) {
 
-					
 					// o commit ja foi baixado pq era o previus de um outro q
 					// tbm foi baixado
 					if (downloadedCommits.get(c.getCommit().getSha()) == null) {
 
-						DownloadCommit(c);
+						Callable<String> sourceCode = new SourceCodeCommit(
+								"/home/jorge/projetos_git/Junit-Commits", c);
+						Future<String> future = pool.submit(sourceCode);
+
+						futures.add(future);
 
 						downloadedCommits.put(c.getCommit().getCommit()
 								.getSha(), null);
 						mostRelevantCommits.add(c);
 					}
 
-					//baixa o codigo da revisão anterior para depois fazer a comparação entre as metricas
-					if (c.getPrevius() != null && downloadedCommits.get(c.getPrevius().getCommit()
-							.getSha()) == null) {
+					// baixa o codigo da revisão anterior para depois fazer a
+					// comparação entre as metricas
+					if (c.getPrevius() != null
+							&& downloadedCommits.get(c.getPrevius().getCommit()
+									.getSha()) == null) {
 
-						DownloadCommit(c.getPrevius());
+						Callable<String> sourceCode = new SourceCodeCommit(
+								"/home/jorge/projetos_git/Junit-Commits/", c.getPrevius());
+						Future<String> future = pool.submit(sourceCode);
+
+						futures.add(future);
 
 						downloadedCommits.put(c.getPrevius().getCommit()
 								.getCommit().getSha(), null);
 
 					}
 					
-					System.out.println(" ==== Commit baixado =="+
-					"\n hash: "+c.getCommit().getSha()+" commiter: "+c.getCommit().getAuthor().getHtmlUrl());
-					
-					//baixar no maximo 5 commits de cada usuário
-					if(cont++ == 5){
+		
+					// baixar no maximo 3 commits de cada usuário
+					if (contCommits++ == 3) {
 						break;
 					}
-				
 
+				}
+				
+				// baixar no maximo de 5 usuários
+				if (contUsers++ == 5) {
+					break;
 				}
 
 			}
+			
+			for(Future<String> f : futures){
+				String pathCode = f.get();
+				System.out.println("pathCode: "+pathCode);
+			}
 
-		} catch (IOException e) {
+			return mostRelevantCommits;
+			
+		} catch (IOException | InterruptedException | ExecutionException e) {
 			throw new retrieveCommitExeption();
 		}
 
-		return null;
+
 	}
 
-	private void DownloadCommit(Commit c) throws IOException {
-		
-		String urlDownload = c.getCommit().getUrl()
-				.replace("https://api.", "https://").replace("/repos/", "/")
-				.replace("/commits/", "/archive/")
-				+ ".zip";
-
-		DownloadProject downloadProject = new DownloadProject();
-		
-		downloadProject.downloadFromURL(urlDownload,
-				"/home/jorge/projetos_git/Junit-Commits/", c.getCommit()
-						.getSha());
-	}
 
 	public static void main(String[] args) throws MetricPreparationException {
 
@@ -354,9 +369,9 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 		// testGetAverageMetrics(metricsFacade);
 
-		testPlotGraphic(metricsFacade);
+		//testPlotGraphic(metricsFacade);
 
-		//baixarCodigoFonte(metricsFacade);
+		baixarCodigoFonte(metricsFacade);
 
 	}
 

@@ -8,7 +8,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -53,7 +59,7 @@ public class RelevantCommits {
 	// retorna um map ordenado de acordo com onúmer de commmits de cada usuário
 	// (usuário com maior numero de commits vem primeiro)
 	public Map<String, List<Commit>> getRelevantCommitsOfUser()
-			throws IOException {
+			throws IOException, InterruptedException, ExecutionException {
 
 		// ordena o map de acordo com o numero de commits do usuário
 		Map<String, List<Commit>> map = getCommitsByUser();
@@ -72,7 +78,7 @@ public class RelevantCommits {
 			// sortedMap.get(user).clear();
 			// sortedMap.get(user).addAll(commitsUser);
 
-			/*System.out.println(" =====  Commits de:  " + user + " =====");
+			System.out.println(" =====  Commits de:  " + user + " =====");
 
 			for (Commit c : commitsUser) {
 				System.out.println("hash: " + c.getCommit().getSha()
@@ -82,16 +88,16 @@ public class RelevantCommits {
 					System.out.println("previus: "
 							+ c.getPrevius().getCommit().getSha() + "\n");
 				}
-			}*/
+			}
 
 		}
 
 		return sortedMap;
 	}
 
-	private Map<String, List<Commit>> getCommitsByUser() throws IOException {
+	private Map<String, List<Commit>> getCommitsByUser() throws IOException, InterruptedException, ExecutionException {
 
-		List<Commit> commits = getAllCommits();
+		Set<Commit> commits = getAllCommits();
 
 		Map<String, List<Commit>> commitsByUser = new HashMap<String, List<Commit>>();
 
@@ -140,53 +146,71 @@ public class RelevantCommits {
 		return Arrays.asList(commits);
 	}
 
-	private List<Commit> getAllCommits() throws IOException {
+	private Set<Commit> getAllCommits() throws IOException, InterruptedException, ExecutionException {
 
 		GitHubClient client = new GitHubClient();
 		client.setOAuth2Token(TokenOAuth.getToken());
 
-		CommitService cservice = new CommitService(client);
+		final CommitService cservice = new CommitService(client);
 
 		// RepositoryId repId = RepositoryId.create("spring-projects",
 		// "spring-boot");
-		RepositoryId repId = RepositoryId.create(owner, repository);
+		final RepositoryId repId = RepositoryId.create(owner, repository);
 		// RepositoryId repId = RepositoryId.create("eclipse", "smarthome");
 
 		List<RepositoryCommit> rc = cservice.getCommits(repId);
 
-		List<Commit> commits = new ArrayList<Commit>();
+		//List<Commit> commits = new ArrayList<Commit>();
 
 		Commit commit = null;
 		Commit previus = null;
 		int cont = 0;
 		// faz o commit apontar para o commit anterior (depois s lista vaiser
 		// rearrajada e preciaremos desse ponteiro)
-		for (RepositoryCommit c : rc) {
+		
+		ExecutorService executor = Executors.newCachedThreadPool();
+		
+		Map<Commit, Future<RepositoryCommit>> commits = new HashMap<>();
+		
+		for (final RepositoryCommit c : rc) {
 
 			Commit aux = commit;
 
 			commit = new Commit();
 			// pega as informações do commit
-			c = cservice.getCommit(repId, c.getSha());
-			commit.setCommit(c);
-
+				
+			Future<RepositoryCommit> f = executor.submit(new Callable<RepositoryCommit>() {
+				@Override
+				public RepositoryCommit call() throws Exception {
+					return cservice.getCommit(repId, c.getSha());
+				}
+			});
+				
+			
 			if (aux != null) {
 				aux.setPrevius(commit);
 			}
 
-			commits.add(commit);
+			commits.put(commit, f);
 
 			// recuperar ate 100 commits
-			if (cont++ == 100) {
+			if (cont++ == 200) {
 				break;
 			}
 
 		}
-		return commits;
+	
+		for(Commit c: commits.keySet()){
+			
+			c.setCommit(commits.get(c).get());
+		}
+		
+		
+		return commits.keySet();
 
 	}
 
-	public static void main(String args[]) throws IOException {
+	public static void main(String args[]) throws IOException, InterruptedException, ExecutionException {
 
 		RelevantCommits r = new RelevantCommits("junit-team", "junit");
 
