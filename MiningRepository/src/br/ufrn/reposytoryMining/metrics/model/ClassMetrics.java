@@ -4,14 +4,14 @@ public class ClassMetrics {
 
 	private String classe;
 
-	private Integer CA;
-	private Integer NOC;
-	private Integer LCOM;
-	private Integer WMC;
-	private Integer NPM;
-	private Integer DIT;
-	private Integer RFC;
-	private Integer CBO;
+	private Double CA;
+	private Double NOC;
+	private Double LCOM;
+	private Double WMC;
+	private Double NPM;
+	private Double DIT;
+	private Double RFC;
+	private Double CBO;
 
 	public String getClasse() {
 		return classe;
@@ -21,67 +21,67 @@ public class ClassMetrics {
 		this.classe = classe;
 	}
 
-	public Integer getCA() {
+	public Double getCA() {
 		return CA;
 	}
 
-	public void setCA(Integer cA) {
+	public void setCA(Double cA) {
 		CA = cA;
 	}
 
-	public Integer getNOC() {
+	public Double getNOC() {
 		return NOC;
 	}
 
-	public void setNOC(Integer nOC) {
+	public void setNOC(Double nOC) {
 		NOC = nOC;
 	}
 
-	public Integer getLCOM() {
+	public Double getLCOM() {
 		return LCOM;
 	}
 
-	public void setLCOM(Integer lCOM) {
+	public void setLCOM(Double lCOM) {
 		LCOM = lCOM;
 	}
 
-	public Integer getWMC() {
+	public Double getWMC() {
 		return WMC;
 	}
 
-	public void setWMC(Integer wMC) {
+	public void setWMC(Double wMC) {
 		WMC = wMC;
 	}
 
-	public Integer getNPM() {
+	public Double getNPM() {
 		return NPM;
 	}
 
-	public void setNPM(Integer nPM) {
+	public void setNPM(Double nPM) {
 		NPM = nPM;
 	}
 
-	public Integer getDIT() {
+	public Double getDIT() {
 		return DIT;
 	}
 
-	public void setDIT(Integer dIT) {
+	public void setDIT(Double dIT) {
 		DIT = dIT;
 	}
 
-	public Integer getRFC() {
+	public Double getRFC() {
 		return RFC;
 	}
 
-	public void setRFC(Integer rFC) {
+	public void setRFC(Double rFC) {
 		RFC = rFC;
 	}
 
-	public Integer getCBO() {
+	public Double getCBO() {
 		return CBO;
 	}
 
-	public void setCBO(Integer cBO) {
+	public void setCBO(Double cBO) {
 		CBO = cBO;
 	}
 

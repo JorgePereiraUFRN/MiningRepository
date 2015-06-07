@@ -30,9 +30,11 @@ public class LocalShell {
             final InputStreamReader isr = new InputStreamReader(is);
             br = new BufferedReader(isr);
             
+            System.out.println("executando comando: "+command);
+            
             String line;            
             while((line = br.readLine()) != null) {
-                System.out.println("Retorno do comando = [" + line + "]");
+     //           System.out.println("Retorno do comando = [" + line + "]");
             }
         } catch (IOException ioe) {
             log.severe("Erro ao executar comando shell" + ioe.getMessage());

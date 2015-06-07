@@ -13,6 +13,7 @@ import br.ufrn.reposytoryMining.metrics.model.Commit;
 import br.ufrn.reposytoryMining.metrics.model.Metric;
 import br.ufrn.reposytoryMining.metrics.model.PackageMetrics;
 import br.ufrn.reposytoryMining.metrics.util.Calc;
+import br.ufrn.reposytoryMining.metrics.util.CompileSorces;
 import br.ufrn.reposytoryMining.metrics.util.DownloadProject;
 import br.ufrn.reposytoryMining.metrics.util.MeasureMetrics;
 import br.ufrn.reposytoryMining.metrics.util.PlotGraphic;
@@ -30,11 +31,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -44,6 +48,9 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
+import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.MergeStatus;
 
 import nl.rug.jbi.jsm.core.JSMCore;
@@ -132,25 +139,24 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 				try {
 
+					// não me pergunte o pq dessa gambiarra, só sei q ta
+					// funcinando!
 					if (c.getName().equals(CA.class.getName())) {
-						metricsClass.setCA((Integer) m.get(c));
+						metricsClass.setCA((((Integer) m.get(c)) * 1.0) * 1.0);
 					} else if (c.getName().equals(CBO.class.getName())) {
-						metricsClass.setCBO((Integer) m.get(c));
-					} /*
-					 * else if (c.getName().equals(CBO.class.getName())) {
-					 * metricsClass.setCBO((Float) m.get(c)); }
-					 */else if (c.getName().equals(DIT.class.getName())) {
-						metricsClass.setDIT((Integer) m.get(c));
+						metricsClass.setCBO(((Integer) m.get(c)) * 1.0);
+					} else if (c.getName().equals(DIT.class.getName())) {
+						metricsClass.setDIT(((Integer) m.get(c)) * 1.0);
 					} else if (c.getName().equals(LCOM.class.getName())) {
-						metricsClass.setLCOM((Integer) m.get(c));
+						metricsClass.setLCOM(((Integer) m.get(c)) * 1.0);
 					} else if (c.getName().equals(NOC.class.getName())) {
-						metricsClass.setNOC((Integer) m.get(c));
+						metricsClass.setNOC(((Integer) m.get(c)) * 1.0);
 					} else if (c.getName().equals(NPM.class.getName())) {
-						metricsClass.setNPM((Integer) m.get(c));
+						metricsClass.setNPM(((Integer) m.get(c)) * 1.0);
 					} else if (c.getName().equals(RFC.class.getName())) {
-						metricsClass.setRFC((Integer) m.get(c));
+						metricsClass.setRFC(((Integer) m.get(c)) * 1.0);
 					} else if (c.getName().equals(WMC.class.getName())) {
-						metricsClass.setWMC((Integer) m.get(c));
+						metricsClass.setWMC(((Integer) m.get(c)) * 1.0);
 					}
 
 				} catch (ClassCastException e) {
@@ -159,7 +165,10 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 				}
 			}
 
-			metrics.put(key, metricsClass);
+			// pega o nome da classe (nome nao qualificado)
+			int v = key.lastIndexOf('.');
+			String className = key.substring(v + 1);
+			metrics.put(className, metricsClass);
 
 		}
 		return metrics;
@@ -244,8 +253,17 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 			Map<Metric, Double> metricsClass = getAverageMetricsPoject(pathVersions
 					.get(version));
 
+			System.out.println("metricas da versao "+version);
+			
+			for(Metric m: metricsClass.keySet()){
+				System.out.println(m +": "+ metricsClass.get(m));
+			}
+			
 			metricsProjects.put(version, metricsClass);
 
+			Scanner s = new Scanner(System.in);
+			System.out.println("digite algo e pressione entrer para continuar");
+			s.next();
 		}
 
 		PlotGraphic plot = null;
@@ -274,7 +292,7 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 	@Override
 	public Set<Commit> downloadRelevantCommits(String ownerRepository,
-			String repository) throws retrieveCommitExeption {
+			String repository, String pathCodes) throws retrieveCommitExeption {
 
 		RelevantCommits relevantCommits = new RelevantCommits(ownerRepository,
 				repository);
@@ -291,24 +309,49 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 			Set<Future<String>> futures = new HashSet<>();
 
-			int contUsers = 0;
+			int contUsers = 1;
 			for (String user : commits.keySet()) {
 
-				int contCommits = 0;
-				for (Commit c : commits.get(user)) {
+				// ordena os commits do usuário de acordo com o numero de
+				// modificações
+				Commit commitsUser[] = commits.get(user).toArray(
+						new Commit[commits.get(user).size()]);
+
+				Arrays.sort(commitsUser, new Comparator<Commit>() {
+					@Override
+					public int compare(Commit arg0, Commit arg1) {
+
+						int modificacoes1 = arg0.getCommit().getStats()
+								.getTotal();
+						int modificacoes2 = arg1.getCommit().getStats()
+								.getTotal();
+
+						if (modificacoes1 > modificacoes2)
+							return -1;
+						if (modificacoes1 < modificacoes2)
+							return 1;
+						return 0;
+					}
+
+				});
+
+				int contCommits = 1;
+				for (Commit c : commitsUser) {
 
 					// o commit ja foi baixado pq era o previus de um outro q
 					// tbm foi baixado
 					if (downloadedCommits.get(c.getCommit().getSha()) == null) {
 
 						Callable<String> sourceCode = new SourceCodeCommit(
-								"/home/jorge/projetos_git/Junit-Commits", c);
+								"/home/jorge/" + pathCodes, c, repository);
+
 						Future<String> future = pool.submit(sourceCode);
 
 						futures.add(future);
 
 						downloadedCommits.put(c.getCommit().getCommit()
 								.getSha(), null);
+
 						mostRelevantCommits.add(c);
 					}
 
@@ -319,7 +362,8 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 									.getSha()) == null) {
 
 						Callable<String> sourceCode = new SourceCodeCommit(
-								"/home/jorge/projetos_git/Junit-Commits/", c.getPrevius());
+								"/home/jorge/" + pathCodes, c.getPrevius(),
+								repository);
 						Future<String> future = pool.submit(sourceCode);
 
 						futures.add(future);
@@ -328,38 +372,187 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 								.getCommit().getSha(), null);
 
 					}
-					
-		
+
 					// baixar no maximo 3 commits de cada usuário
-					if (contCommits++ == 3) {
+					if (contCommits++ == 2) {
 						break;
 					}
 
 				}
-				
+
 				// baixar no maximo de 5 usuários
-				if (contUsers++ == 5) {
+				if (contUsers++ == 2) {
 					break;
 				}
 
 			}
-			
-			for(Future<String> f : futures){
+
+			for (Future<String> f : futures) {
 				String pathCode = f.get();
-				System.out.println("pathCode: "+pathCode);
+				System.out.println("commit downloaded : " + pathCode);
 			}
 
 			return mostRelevantCommits;
-			
+
 		} catch (IOException | InterruptedException | ExecutionException e) {
 			throw new retrieveCommitExeption();
 		}
 
+	}
+
+	@Override
+	public Map<Metric, Double> getProgressMetrics(Commit commit) {
+
+		if(commit == null || commit.getPrevius() == null)
+			return null;
+		
+		Map<String, ClassMetrics> classMetrics = getClassMetrics(commit.getPathSourceCode());
+
+		Map<String, ClassMetrics> oldClassMetrics = getClassMetrics(commit.getPrevius().getPathSourceCode());
+
+		List<CommitFile> changedClass = commit.getCommit().getFiles();
+
+		Map<Metric, Double> progressMetrics = new HashMap<>();
+
+		ClassMetrics averageProjectMetrics = null;
+		
+		ClassMetrics currentM = null, oldM = null;
+		
+
+		MetricContribuition mContribuition = new MetricContribuition();
+		Map<Metric, Double> contribuition = null;
+		
+		double CA = 0,  NOC = 0, LCOM = 0, WMC = 0, NPM = 0, DIT = 0, RFC = 0, CBO = 0;
+		int cont = 0;
+		
+		for (CommitFile file : changedClass) {
+
+			if (file.getFilename().contains(".java")) {
+
+				String[] aux = file.getFilename().split("/");
+
+				if (aux != null && aux.length > 0) {
+
+					String className = aux[aux.length - 1].replace(".java", "");
+
+					currentM = classMetrics.get(className);
+					
+					if (file.getStatus().equalsIgnoreCase("modified")) {
+						
+						oldM = oldClassMetrics.get(className);
+						
+	
+					} else if (file.getStatus().equalsIgnoreCase("added")) {
+
+						if (averageProjectMetrics == null) {
+
+							averageProjectMetrics = getAvgValuesProjectMetrics(oldClassMetrics);	
+							
+						}
+						
+						oldM = averageProjectMetrics;
+					}
+					
+					//System.out.println("---------------------current "+currentM);
+					
+					if(currentM != null && oldM != null){
+						
+						contribuition = mContribuition
+								.calcMetricContibuition(currentM, oldM);
+						
+						CA += contribuition.get(Metric.CA);
+						NOC += contribuition.get(Metric.NOC);
+						LCOM += contribuition.get(Metric.LCOM);
+						WMC += contribuition.get(Metric.WMC);
+						NPM += contribuition.get(Metric.CA);
+						DIT += contribuition.get(Metric.DIT);
+						RFC += contribuition.get(Metric.RFC);
+						CBO += contribuition.get(Metric.CBO);
+						
+						cont ++;
+						contribuition = null;
+						//System.out.println(progressMetrics);
+					}else{
+						System.out.println("------- metricas nulas! --------"+className+"\n"
+								+ " status "+file.getStatus()+" commit: "+commit.getCommit().getSha()
+								+"\nprevius :"+commit.getPrevius().getCommit().getSha());
+						//System.out.println("current "+currentM);
+						//System.out.println("old "+oldM);
+					}
+						
+
+				}
+						
+
+			}
+			
+			
+		}
+		
+		if(cont > 0){
+			
+			progressMetrics.put(Metric.CA, CA / cont);
+			progressMetrics.put(Metric.CBO, CBO / cont);
+			progressMetrics.put(Metric.DIT, DIT / cont);
+			progressMetrics.put(Metric.LCOM, LCOM /cont);
+			progressMetrics.put(Metric.NOC, NOC / cont);
+			progressMetrics.put(Metric.NPM, NPM / cont);
+			progressMetrics.put(Metric.RFC, RFC / cont);
+			progressMetrics.put(Metric.WMC, WMC / cont);
+		}else{
+			//nennhum arquivo de codigo fonte foi modificado
+			
+			progressMetrics.put(Metric.CA, 0.0);
+			progressMetrics.put(Metric.CBO, 0.0);
+			progressMetrics.put(Metric.DIT, 0.0);
+			progressMetrics.put(Metric.LCOM, 0.0);
+			progressMetrics.put(Metric.NOC, 0.0);
+			progressMetrics.put(Metric.NPM, 0.0);
+			progressMetrics.put(Metric.RFC, 0.0);
+			progressMetrics.put(Metric.WMC, 0.0);
+		}
+		
+
+		return progressMetrics;
 
 	}
 
+	private ClassMetrics getAvgValuesProjectMetrics(
+			Map<String, ClassMetrics> oldClassMetrics) {
+		ClassMetrics averageProjectMetrics;
+		Map<Metric, Double> metrics = Calc
+				.getAverageClassMetrics(oldClassMetrics);
 
-	public static void main(String[] args) throws MetricPreparationException {
+		averageProjectMetrics = new ClassMetrics();
+		averageProjectMetrics.setCA(metrics.get(Metric.CA));
+		averageProjectMetrics.setCBO(metrics.get(Metric.CBO));
+		averageProjectMetrics.setDIT(metrics.get(Metric.DIT));
+		averageProjectMetrics.setLCOM(metrics.get(Metric.LCOM));
+		averageProjectMetrics.setNOC(metrics.get(Metric.NOC));
+		averageProjectMetrics.setNPM(metrics.get(Metric.NPM));
+		averageProjectMetrics.setRFC(metrics.get(Metric.RFC));
+		averageProjectMetrics.setWMC(metrics.get(Metric.WMC));
+		return averageProjectMetrics;
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static void main(String[] args) throws MetricPreparationException,
+			retrieveCommitExeption, IOException {
 
 		MetricsFacadeInterface metricsFacade = new MetricsFacade();
 
@@ -369,15 +562,63 @@ public class MetricsFacade implements /* Frontend, */MetricsFacadeInterface {
 
 		// testGetAverageMetrics(metricsFacade);
 
-		//testPlotGraphic(metricsFacade);
+		// testPlotGraphic(metricsFacade);
 
-		baixarCodigoFonte(metricsFacade);
+		// baixarCodigoFonte(metricsFacade);
 
+		Set<Commit> relevanteCommits = metricsFacade.downloadRelevantCommits(
+				"junit-team", "junit", "projetos_git/Junit-Commits/");
+
+		Set<String> pathProjects = new HashSet<>();
+
+		for (Commit c : relevanteCommits) {
+			pathProjects.add(c.getPathSourceCode());
+			pathProjects.add(c.getPrevius().getPathSourceCode());
+		}
+
+		new CompileSorces().compileSourceCode(pathProjects,
+				"projetos_git/Junit-Commits/");
+
+		Scanner s = new Scanner(System.in);
+
+		System.out
+				.println("Exetue o script gerado e  em seguida pressione qualquer tecla para continuar");
+		s.next();
+
+		for (Commit c : relevanteCommits) {
+
+			if (c != null && c.getPrevius() != null) {
+				/*System.out.println("Contribuição do commit "
+						+ c.getCommit().getSha() + " desenvolvedor: "
+						+ c.getCommit().getAuthor().getHtmlUrl());*/
+
+				Map<Metric, Double> progress = metricsFacade
+						.getProgressMetrics(c);
+
+				String msg = "Contribuição do commit "
+						+ c.getCommit().getSha() + " desenvolvedor: "
+						+ c.getCommit().getAuthor().getHtmlUrl()+"\n";
+				
+				for (Metric m : progress.keySet()) {
+					msg += m.toString() + ": " + progress.get(m)+"\n";
+					//System.out.println(m.toString() + ": " + progress.get(m));
+				}
+
+				JOptionPane.showMessageDialog(null, msg);
+			} else {
+				System.out.println("Commit anteior nulo");
+
+			}
+		}
+
+		System.out.println("FIM");
 	}
 
 	private static void baixarCodigoFonte(MetricsFacadeInterface metricsFacade) {
 		try {
-			metricsFacade.downloadRelevantCommits("junit-team", "junit");
+			// metricsFacade.downloadRelevantCommits("junit-team", "junit");
+			metricsFacade.downloadRelevantCommits("JorgePereiraUFRN",
+					"MiningRepository", "projetos_git/Junit-Commits/");
 		} catch (retrieveCommitExeption e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

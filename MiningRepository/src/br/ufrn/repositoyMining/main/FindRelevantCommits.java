@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -47,6 +48,14 @@ public class FindRelevantCommits {
 							.next();
 					RepositoryCommit temp  = cservice.getCommit(repId, repositoryCommit.getSha());
 					treeMap.put(temp.getStats().getTotal(), repositoryCommit.getSha());
+					
+					if(temp.getFiles() != null && temp.getFiles().size() > 0){
+						System.out.println("\n\nfilec commit "+temp.getSha()+"\n");
+						
+						for(CommitFile file: temp.getFiles()){
+							System.out.println("file: "+file.getFilename()+" status: "+file.getStatus());
+						}
+					}
 								
 				}
 			} 

@@ -7,6 +7,7 @@ import br.ufrn.reposytoryMining.metrics.Diference;
 
 public class DifferenceMetrics {
 
+	//<nome da classe,<metrica, diferença>>
 	private  Map<String, Map<Metric, Diference>> differenceMetrics = new HashMap<String, Map<Metric, Diference>>();
 
 	

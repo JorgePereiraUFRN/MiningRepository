@@ -12,9 +12,16 @@ public class Commit {
 	private RepositoryCommit commit;
 	private Commit previus;
 	private Map<Metric, Double> metrics = new HashMap<Metric, Double>();
+	private String pathSourceCode;
 	
 	
 	
+	public String getPathSourceCode() {
+		return pathSourceCode;
+	}
+	public void setPathSourceCode(String pathSourceCode) {
+		this.pathSourceCode = pathSourceCode;
+	}
 	public Map<Metric, Double> getMetrics() {
 		return metrics;
 	}

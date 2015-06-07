@@ -31,6 +31,7 @@ public class DownloadProject {
 		is.close();
 		fos.close();
 
+		System.out.println("codigo baixado! "+hash);
 		// apos criar o arquivo fisico, retorna referencia para o mesmo
 		return new File(pathLocal + hash+".zip");
 

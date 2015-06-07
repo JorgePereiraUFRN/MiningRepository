@@ -31,6 +31,8 @@ public interface MetricsFacadeInterface {
    
    void plotGraphics(Map<String, String> pathVersions, Metric[] metrics);
    
-   Set<Commit> downloadRelevantCommits(String ownerRepository, String repository) throws retrieveCommitExeption;
+   Set<Commit> downloadRelevantCommits(String ownerRepository, String repository, String pathCodes) throws retrieveCommitExeption;
+   
+   Map<Metric, Double> getProgressMetrics(Commit commit);
    
 }

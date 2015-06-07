@@ -35,6 +35,11 @@ public class Teste {
 					RepositoryCommit repositoryCommit = (RepositoryCommit) iterator
 							.next();
 					System.out.println("hash: "+repositoryCommit.getSha()+"\n autor: "+repositoryCommit.getUrl()+"\n");
+				
+					
+					if(repositoryCommit.getFiles() != null &&repositoryCommit.getFiles().size() > 0){
+						System.out.println("file "+repositoryCommit.getFiles().get(0).getFilename());
+					}
 					
 				}
 			} else {
